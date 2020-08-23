@@ -1,6 +1,7 @@
 import {Router} from 'express';
 import {v4 as uuidv4} from 'uuid';
 import {IUser, ListQueryParams} from '../types';
+import {updateUserValidation, createUserValidation} from '../validators/user';
 
 interface IController {
     router: Router;
@@ -26,7 +27,7 @@ export class UserController extends Controller {
     }
 
     private create() {
-        this.router.post('/createUser', (req, res) => {
+        this.router.post(UserController.baseUrl, createUserValidation, (req, res) => {
             const user = {...req.body, id: uuidv4(), isDeleted: false} as IUser;
             UserController.users.push(user);
             res.status(200).json(user);
@@ -63,7 +64,7 @@ export class UserController extends Controller {
                 UserController.users = UserController.users.map((u) => (u.id === userId ? {...u, isDeleted: true} : u));
                 res.status(200).json({message: `User with id ${userId} was deleted`});
             })
-            .post((req, res) => {
+            .post(updateUserValidation, (req, res) => {
                 const userId = req.params.id;
                 const userPayload = req.body;
 
