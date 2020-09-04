@@ -1,5 +1,7 @@
+import {Id} from './common';
+
 export interface IUser {
-    id: string;
+    id: Id;
     login: string;
     password: string;
     age: number;

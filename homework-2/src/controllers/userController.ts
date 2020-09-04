@@ -1,7 +1,8 @@
 import {Router} from 'express';
-import {v4 as uuidv4} from 'uuid';
 import {IUser, ListQueryParams} from '../types';
 import {updateUserValidation, createUserValidation} from '../validators/user';
+import {UserServices} from '../services/userServices';
+import {UserData} from '../dataAccess/userData';
 
 interface IController {
     router: Router;
@@ -17,7 +18,6 @@ abstract class Controller implements IController {
 
 export class UserController extends Controller {
     static baseUrl = '/user';
-    private static users: IUser[] = [];
 
     constructor() {
         super();
@@ -27,23 +27,23 @@ export class UserController extends Controller {
     }
 
     private create() {
-        this.router.post(UserController.baseUrl, createUserValidation, (req, res) => {
-            const user = {...req.body, id: uuidv4(), isDeleted: false} as IUser;
-            UserController.users.push(user);
-            res.status(200).json(user);
+        this.router.post(UserController.baseUrl, createUserValidation, async (req, res) => {
+            const userData = req.body as IUser;
+            try {
+                const user = await UserServices.createUser(userData);
+
+                res.status(200).json(user);
+            } catch (e) {
+                res.status(500).json({message: e});
+            }
         });
     }
 
     private getAuthorizedUserList() {
-        this.router.get<any, any, any, ListQueryParams>('/getAutorizedUser', (req, res) => {
+        this.router.get<any, any, any, ListQueryParams>('/getAutorizedUser', async (req, res) => {
             const {search, limit} = req.query;
 
-            const users: IUser[] = UserController.users
-                .filter((u) => u.login.includes(search) && !u.isDeleted)
-                .sort((user, prevUser) => user.login.localeCompare(prevUser.login))
-                .slice(0, limit);
-
-            console.log(users);
+            const users = await UserData.searchUsers(search, limit);
             res.status(200).json(users);
         });
     }
@@ -51,24 +51,25 @@ export class UserController extends Controller {
     private nestedRoures() {
         this.router
             .route(`${UserController.baseUrl}/:id`)
-            .get((req, res) => {
+            .get(async (req, res) => {
                 const userId = req.params.id;
 
-                const user = UserController.users.find((i) => i.id === userId) || null;
+                const user = await UserData.get(userId);
 
                 res.status(200).json(user);
             })
-            .delete((req, res) => {
+            .delete(async (req, res) => {
                 const userId = req.params.id;
 
-                UserController.users = UserController.users.map((u) => (u.id === userId ? {...u, isDeleted: true} : u));
+                await UserData.delete(userId);
+
                 res.status(200).json({message: `User with id ${userId} was deleted`});
             })
-            .post(updateUserValidation, (req, res) => {
+            .post(updateUserValidation, async (req, res) => {
                 const userId = req.params.id;
                 const userPayload = req.body;
 
-                UserController.users = UserController.users.map((u) => (u.id === userId ? {...u, ...userPayload} : u));
+                await UserData.update({id: userId, ...userPayload});
 
                 res.status(200).json({message: `User was changed`});
             });
