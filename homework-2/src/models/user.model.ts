@@ -1,7 +1,7 @@
 import {DataTypes} from 'sequelize';
 
 export const userModel = {
-    id: {type: DataTypes.UUID, primaryKey: true, allowNull: false},
+    id: {type: DataTypes.BIGINT, primaryKey: true, autoIncrement: true, allowNull: false},
     login: {type: DataTypes.STRING(25), allowNull: false},
     password: {type: DataTypes.STRING(15), allowNull: false},
     isDeleted: {type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false},
