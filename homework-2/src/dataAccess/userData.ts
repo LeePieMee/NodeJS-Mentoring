@@ -1,32 +1,33 @@
 import {userModel} from '../models/user.model';
 import {IUser, Id, Data} from '../types';
-import {Sequelize, Op} from 'sequelize';
+import {Op, ModelCtor} from 'sequelize';
+import {DataSource} from './dataSource';
 
 type UserSchema = Data<IUser>;
 
-export class DataSource {
-    static sequelize = new Sequelize(
-        'postgres://sfblmsjr:o0V2WStfvTaP_H6ZO_k-gz4PJUX9cQ5d@lallah.db.elephantsql.com:5432/sfblmsjr',
-    );
-}
+const model = DataSource.sequelize.define<UserSchema>('users', userModel, {freezeTableName: true, timestamps: false});
 
 export class UserData {
-    static User = DataSource.sequelize.define<UserSchema>('users', userModel, {freezeTableName: true});
+    private userModel: ModelCtor<UserSchema>;
 
-    public static save(userDto: IUser) {
-        return UserData.User.create({...userDto});
+    constructor(userModel: ModelCtor<UserSchema>) {
+        this.userModel = userModel;
     }
 
-    public static delete(id: Id) {
-        UserData.User.destroy({
+    public save(userDto: IUser) {
+        return this.userModel.create({...userDto});
+    }
+
+    public delete(id: Id) {
+        this.userModel.destroy({
             where: {
                 id,
             },
         });
     }
 
-    public static update(userDto: IUser) {
-        UserData.User.update(
+    public update(userDto: IUser) {
+        this.userModel.update(
             {...userDto},
             {
                 where: {
@@ -36,11 +37,13 @@ export class UserData {
         );
     }
 
-    public static get(id: Id) {
-        return UserData.User.findOne({where: {id}});
+    public get(id: Id) {
+        return this.userModel.findOne({where: {id}});
     }
 
-    public static searchUsers(login: string, limit: number) {
-        return UserData.User.findAll({where: {login: {[Op.like]: `%${login}%`}}, limit});
+    public searchUsers(login: string, limit: number) {
+        return this.userModel.findAll({where: {login: {[Op.like]: `%${login}%`}}, limit});
     }
 }
+
+export const userData = new UserData(model);

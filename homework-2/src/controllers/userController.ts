@@ -2,7 +2,7 @@ import {Router} from 'express';
 import {IUser, ListQueryParams} from '../types';
 import {updateUserValidation, createUserValidation} from '../validators/user';
 import {UserServices} from '../services/userServices';
-import {UserData} from '../dataAccess/userData';
+import {userData, UserData} from '../dataAccess/userData';
 
 interface IController {
     router: Router;
@@ -16,11 +16,13 @@ abstract class Controller implements IController {
     }
 }
 
-export class UserController extends Controller {
+class UserController extends Controller {
     static baseUrl = '/user';
+    private data: UserData;
 
-    constructor() {
+    constructor(data: UserData) {
         super();
+        this.data = data;
         this.create();
         this.getAuthorizedUserList();
         this.nestedRoures();
@@ -33,8 +35,8 @@ export class UserController extends Controller {
                 const user = await UserServices.createUser(userData);
 
                 res.status(200).json(user);
-            } catch (e) {
-                res.status(500).json({message: e});
+            } catch (error) {
+                res.status(500).json({message: error});
             }
         });
     }
@@ -43,7 +45,7 @@ export class UserController extends Controller {
         this.router.get<any, any, any, ListQueryParams>('/getAutorizedUser', async (req, res) => {
             const {search, limit} = req.query;
 
-            const users = await UserData.searchUsers(search, limit);
+            const users = await this.data.searchUsers(search, limit);
             res.status(200).json(users);
         });
     }
@@ -54,14 +56,14 @@ export class UserController extends Controller {
             .get(async (req, res) => {
                 const userId = req.params.id;
 
-                const user = await UserData.get(userId);
+                const user = await this.data.get(userId);
 
                 res.status(200).json(user);
             })
             .delete(async (req, res) => {
                 const userId = req.params.id;
 
-                await UserData.delete(userId);
+                await this.data.delete(userId);
 
                 res.status(200).json({message: `User with id ${userId} was deleted`});
             })
@@ -69,9 +71,11 @@ export class UserController extends Controller {
                 const userId = req.params.id;
                 const userPayload = req.body;
 
-                await UserData.update({id: userId, ...userPayload});
+                await this.data.update({id: userId, ...userPayload});
 
                 res.status(200).json({message: `User was changed`});
             });
     }
 }
+
+export const userController = new UserController(userData);
