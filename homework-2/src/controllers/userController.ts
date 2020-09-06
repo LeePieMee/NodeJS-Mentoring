@@ -1,20 +1,8 @@
-import {Router} from 'express';
 import {IUser, ListQueryParams} from '../types';
 import {updateUserValidation, createUserValidation} from '../validators/user';
 import {UserServices} from '../services/userServices';
 import {userData, UserData} from '../dataAccess/userData';
-
-interface IController {
-    router: Router;
-}
-
-abstract class Controller implements IController {
-    public router: Router;
-
-    constructor() {
-        this.router = Router();
-    }
-}
+import {Controller} from './controller';
 
 class UserController extends Controller {
     static baseUrl = '/user';
@@ -25,7 +13,7 @@ class UserController extends Controller {
         this.data = data;
         this.create();
         this.getAuthorizedUserList();
-        this.nestedRoures();
+        this.nestedRoutes();
     }
 
     private create() {
@@ -42,7 +30,7 @@ class UserController extends Controller {
     }
 
     private getAuthorizedUserList() {
-        this.router.get<any, any, any, ListQueryParams>('/getAutorizedUser', async (req, res) => {
+        this.router.get<any, any, any, ListQueryParams>('/getAuthorizedUser', async (req, res) => {
             const {search, limit} = req.query;
 
             const users = await this.data.searchUsers(search, limit);
@@ -50,7 +38,7 @@ class UserController extends Controller {
         });
     }
 
-    private nestedRoures() {
+    private nestedRoutes() {
         this.router
             .route(`${UserController.baseUrl}/:id`)
             .get(async (req, res) => {

@@ -1,33 +1,24 @@
 import {userModel} from '../models/user.model';
-import {IUser, Id, Data} from '../types';
+import {IUser, Data} from '../types';
 import {Op, ModelCtor} from 'sequelize';
 import {DataSource} from './dataSource';
+import {DataControl} from './dataControl';
 
 type UserSchema = Data<IUser>;
 
 const model = DataSource.sequelize.define<UserSchema>('users', userModel, {freezeTableName: true, timestamps: false});
 
-export class UserData {
-    private userModel: ModelCtor<UserSchema>;
-
-    constructor(userModel: ModelCtor<UserSchema>) {
-        this.userModel = userModel;
+export class UserData extends DataControl<UserSchema> {
+    constructor(model: ModelCtor<UserSchema>) {
+        super(model);
     }
 
     public save(userDto: IUser) {
-        return this.userModel.create({...userDto});
-    }
-
-    public delete(id: Id) {
-        this.userModel.destroy({
-            where: {
-                id,
-            },
-        });
+        return this.model.create({...userDto});
     }
 
     public update(userDto: IUser) {
-        this.userModel.update(
+        this.model.update(
             {...userDto},
             {
                 where: {
@@ -37,12 +28,8 @@ export class UserData {
         );
     }
 
-    public get(id: Id) {
-        return this.userModel.findOne({where: {id}});
-    }
-
     public searchUsers(login: string, limit: number) {
-        return this.userModel.findAll({where: {login: {[Op.like]: `%${login}%`}}, limit});
+        return this.model.findAll({where: {login: {[Op.like]: `%${login}%`}}, limit});
     }
 }
 

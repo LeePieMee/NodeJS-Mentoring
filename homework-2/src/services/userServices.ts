@@ -1,4 +1,4 @@
-import {IUser, Id} from '../types';
+import {IUser} from '../types';
 import {userData} from '../dataAccess/userData';
 
 export class UserServices {
