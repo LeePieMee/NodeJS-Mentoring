@@ -13,3 +13,9 @@ export interface Group {
     name: string;
     permissions: Permissions[];
 }
+
+export interface UserGroup {
+    id: number;
+    groupId: Group['id'];
+    userId: IUser['id'];
+}

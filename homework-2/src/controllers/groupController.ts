@@ -22,7 +22,6 @@ class GroupController extends Controller {
         this.router.post(`${GroupController.baseUrl}`, async (req, res) => {
             const group = req.body as Group;
             try {
-                console.log(true);
                 const user = await groupData.save(group);
 
                 res.status(200).json(user);

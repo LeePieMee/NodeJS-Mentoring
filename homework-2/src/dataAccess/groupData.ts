@@ -6,7 +6,7 @@ import {DataControl} from './dataControl';
 
 type GroupSchema = Data<Group>;
 
-const model = DataSource.sequelize.define<GroupSchema>('groups', groupModel, {
+export const model = DataSource.sequelize.define<GroupSchema>('groups', groupModel, {
     freezeTableName: true,
     timestamps: false,
 });

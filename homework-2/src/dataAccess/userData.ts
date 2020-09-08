@@ -6,7 +6,10 @@ import {DataControl} from './dataControl';
 
 type UserSchema = Data<IUser>;
 
-const model = DataSource.sequelize.define<UserSchema>('users', userModel, {freezeTableName: true, timestamps: false});
+export const model = DataSource.sequelize.define<UserSchema>('users', userModel, {
+    freezeTableName: true,
+    timestamps: false,
+});
 
 export class UserData extends DataControl<UserSchema> {
     constructor(model: ModelCtor<UserSchema>) {
