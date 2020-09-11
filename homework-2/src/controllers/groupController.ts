@@ -1,14 +1,14 @@
 import {Controller} from './controller';
-import {GroupData, groupData} from '../dataAccess/groupData';
+import {groupService, GroupService} from '../services/groupService';
 import {Group} from '../types';
 
 class GroupController extends Controller {
     static baseUrl = '/group';
-    private data: GroupData;
+    private service: GroupService;
 
-    constructor(data: GroupData) {
+    constructor(service: GroupService) {
         super();
-        this.data = data;
+        this.service = service;
         this.nestedRoutes();
         this.getAllGroups();
         this.create();
@@ -20,11 +20,11 @@ class GroupController extends Controller {
 
     private create() {
         this.router.post(`${GroupController.baseUrl}`, async (req, res) => {
-            const group = req.body as Group;
+            const groupDto = req.body as Group;
             try {
-                const user = await groupData.save(group);
+                const group = await this.service.save(groupDto);
 
-                res.status(200).json(user);
+                res.status(200).json(group);
             } catch (error) {
                 res.status(500).json({message: error});
             }
@@ -37,14 +37,14 @@ class GroupController extends Controller {
             .get(async (req, res) => {
                 const userId = req.params.id;
 
-                const user = await this.data.get(userId);
+                const user = await this.service.get(userId);
 
                 res.status(200).json(user);
             })
             .delete(async (req, res) => {
                 const userId = req.params.id;
 
-                await this.data.delete(userId);
+                await this.service.delete(userId);
 
                 res.status(200).json({message: `Group with id ${userId} was deleted`});
             })
@@ -52,11 +52,11 @@ class GroupController extends Controller {
                 const userId = req.params.id;
                 const userPayload = req.body;
 
-                await this.data.update({id: userId, ...userPayload});
+                await this.service.update({id: userId, ...userPayload});
 
                 res.status(200).json({message: `Group was changed`});
             });
     }
 }
 
-export const groupController = new GroupController(groupData);
+export const groupController = new GroupController(groupService);

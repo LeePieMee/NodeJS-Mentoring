@@ -1,14 +1,13 @@
 import {IUser, ListQueryParams} from '../types';
 import {updateUserValidation, createUserValidation} from '../validators/user';
-import {UserServices} from '../services/userServices';
-import {userData, UserData} from '../dataAccess/userData';
+import {userService, UserService} from '../services/userService';
 import {Controller} from './controller';
 
 class UserController extends Controller {
     static baseUrl = '/user';
-    private data: UserData;
+    private data: UserService;
 
-    constructor(data: UserData) {
+    constructor(data: UserService) {
         super();
         this.data = data;
         this.create();
@@ -20,7 +19,7 @@ class UserController extends Controller {
         this.router.post(UserController.baseUrl, createUserValidation, async (req, res) => {
             const userData = req.body as IUser;
             try {
-                const user = await UserServices.createUser(userData);
+                const user = await this.data.createUser(userData);
 
                 res.status(200).json(user);
             } catch (error) {
@@ -66,4 +65,4 @@ class UserController extends Controller {
     }
 }
 
-export const userController = new UserController(userData);
+export const userController = new UserController(userService);

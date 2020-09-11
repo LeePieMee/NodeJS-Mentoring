@@ -1,12 +1,12 @@
 import {Controller} from './controller';
-import {UserGroupData, userGroupData} from '../dataAccess/userGroupData';
+import {UserGroupService, userGroupService} from '../services/userGroupService';
 import {UserGroup} from '../types';
 
 class GroupController extends Controller {
     static baseUrl = '/userGroup';
-    private data: UserGroupData;
+    private data: UserGroupService;
 
-    constructor(data: UserGroupData) {
+    constructor(data: UserGroupService) {
         super();
         this.data = data;
         this.create();
@@ -26,4 +26,4 @@ class GroupController extends Controller {
     }
 }
 
-export const userGroupController = new GroupController(userGroupData);
+export const userGroupController = new GroupController(userGroupService);
