@@ -1,11 +1,10 @@
 import express, {Application} from 'express';
-import {UserController} from './controllers/userController';
+import {userController} from '../controllers/userController';
+import {middlewares} from '../middlewares';
 
-const controllers = [new UserController()];
+const controllers = [userController];
 
-const middlewares = [express.json];
-
-class Server {
+export class Server {
     private port: number;
     private application: Application;
     static controllers = controllers;
@@ -19,7 +18,7 @@ class Server {
     }
 
     setMiddelwares() {
-        Server.middlewares.forEach((m) => this.application.use('/', m()));
+        Server.middlewares.forEach((m) => this.application.use(m()));
     }
 
     setRoutes() {
@@ -30,7 +29,3 @@ class Server {
         this.application.listen(this.port);
     }
 }
-
-export const server = new Server(3000);
-
-server.listen();
