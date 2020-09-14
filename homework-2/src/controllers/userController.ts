@@ -1,38 +1,25 @@
-import {Router} from 'express';
 import {IUser, ListQueryParams} from '../types';
 import {updateUserValidation, createUserValidation} from '../validators/user';
-import {UserServices} from '../services/userServices';
-import {userData, UserData} from '../dataAccess/userData';
-
-interface IController {
-    router: Router;
-}
-
-abstract class Controller implements IController {
-    public router: Router;
-
-    constructor() {
-        this.router = Router();
-    }
-}
+import {userService, UserService} from '../services/userService';
+import {Controller} from './controller';
 
 class UserController extends Controller {
     static baseUrl = '/user';
-    private data: UserData;
+    private data: UserService;
 
-    constructor(data: UserData) {
+    constructor(data: UserService) {
         super();
         this.data = data;
         this.create();
         this.getAuthorizedUserList();
-        this.nestedRoures();
+        this.nestedRoutes();
     }
 
     private create() {
         this.router.post(UserController.baseUrl, createUserValidation, async (req, res) => {
             const userData = req.body as IUser;
             try {
-                const user = await UserServices.createUser(userData);
+                const user = await this.data.createUser(userData);
 
                 res.status(200).json(user);
             } catch (error) {
@@ -42,7 +29,7 @@ class UserController extends Controller {
     }
 
     private getAuthorizedUserList() {
-        this.router.get<any, any, any, ListQueryParams>('/getAutorizedUser', async (req, res) => {
+        this.router.get<any, any, any, ListQueryParams>('/getAuthorizedUser', async (req, res) => {
             const {search, limit} = req.query;
 
             const users = await this.data.searchUsers(search, limit);
@@ -50,7 +37,7 @@ class UserController extends Controller {
         });
     }
 
-    private nestedRoures() {
+    private nestedRoutes() {
         this.router
             .route(`${UserController.baseUrl}/:id`)
             .get(async (req, res) => {
@@ -78,4 +65,4 @@ class UserController extends Controller {
     }
 }
 
-export const userController = new UserController(userData);
+export const userController = new UserController(userService);

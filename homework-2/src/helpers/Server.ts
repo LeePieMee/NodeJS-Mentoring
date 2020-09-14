@@ -1,8 +1,10 @@
 import express, {Application} from 'express';
-import {userController} from '../controllers/userController';
 import {middlewares} from '../middlewares';
+import {groupController} from '../controllers/groupController';
+import {userController} from '../controllers/userController';
+import {userGroupController} from '../controllers/userGroupController';
 
-const controllers = [userController];
+const controllers = [userController, groupController, userGroupController];
 
 export class Server {
     private port: number;
