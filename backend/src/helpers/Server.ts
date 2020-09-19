@@ -1,5 +1,5 @@
 import express, {Application} from 'express';
-import {middlewares} from '../middlewares';
+import {middleware} from '../middlewares';
 import {groupController} from '../controllers/groupController';
 import {userController} from '../controllers/userController';
 import {userGroupController} from '../controllers/userGroupController';
@@ -10,17 +10,17 @@ export class Server {
     private port: number;
     private application: Application;
     static controllers = controllers;
-    static middlewares = middlewares;
+    static middleware = middleware;
 
     constructor(port: number) {
         this.port = port;
         this.application = express();
-        this.setMiddelwares();
+        this.setMiddleware();
         this.setRoutes();
     }
 
-    setMiddelwares() {
-        Server.middlewares.forEach((m) => this.application.use(m()));
+    setMiddleware() {
+        Server.middleware.forEach((m) => this.application.use(m()));
     }
 
     setRoutes() {
