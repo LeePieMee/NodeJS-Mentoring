@@ -2,6 +2,7 @@ import {IUser, ListQueryParams} from '../types';
 import {updateUserValidation, createUserValidation} from '../validators/user';
 import {userService, UserService} from '../services/userService';
 import {Controller} from './controller';
+import {ControllerError} from '../helpers/ErrorHandler';
 
 class UserController extends Controller {
     static baseUrl = '/user';
@@ -29,38 +30,54 @@ class UserController extends Controller {
     }
 
     private getAuthorizedUserList() {
-        this.router.get<any, any, any, ListQueryParams>('/getAuthorizedUser', async (req, res) => {
-            const {search, limit} = req.query;
+        this.router.get<any, any, any, ListQueryParams>('/getAuthorizedUser', async (req, res, next) => {
+            try {
+                const {search, limit} = req.query;
 
-            const users = await this.data.searchUsers(search, limit);
-            res.status(200).json(users);
+                const users = await this.data.searchUsers(search, limit);
+                res.status(200).json(users);
+            } catch (error) {
+                next(new ControllerError('User', 'getAuthorizedUser', error));
+            }
         });
     }
 
     private nestedRoutes() {
         this.router
             .route(`${UserController.baseUrl}/:id`)
-            .get(async (req, res) => {
-                const userId = req.params.id;
+            .get(async (req, res, next) => {
+                try {
+                    const userId = req.params.id;
 
-                const user = await this.data.get(userId);
+                    const user = await this.data.get(userId);
 
-                res.status(200).json(user);
+                    res.status(200).json(user);
+                } catch (error) {
+                    next(new ControllerError('User', 'getUser', error));
+                }
             })
-            .delete(async (req, res) => {
-                const userId = req.params.id;
+            .delete(async (req, res, next) => {
+                try {
+                    const userId = req.params.id;
 
-                await this.data.delete(userId);
+                    await this.data.delete(userId);
 
-                res.status(200).json({message: `User with id ${userId} was deleted`});
+                    res.status(200).json({message: `User with id ${userId} was deleted`});
+                } catch (error) {
+                    next(new ControllerError('User', 'deleteUser', error));
+                }
             })
-            .post(updateUserValidation, async (req, res) => {
-                const userId = req.params.id;
-                const userPayload = req.body;
+            .post(updateUserValidation, async (req, res, next) => {
+                try {
+                    const userId = req.params.id;
+                    const userPayload = req.body;
 
-                await this.data.update({id: userId, ...userPayload});
+                    await this.data.update({id: userId, ...userPayload});
 
-                res.status(200).json({message: `User was changed`});
+                    res.status(200).json({message: `User was changed`});
+                } catch (error) {
+                    next(new ControllerError('User', 'updateUser', error));
+                }
             });
     }
 }

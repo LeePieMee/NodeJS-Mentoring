@@ -1,6 +1,7 @@
 import {Controller} from './controller';
 import {groupService, GroupService} from '../services/groupService';
 import {Group} from '../types';
+import {ControllerError} from '../helpers/ErrorHandler';
 
 class GroupController extends Controller {
     static baseUrl = '/group';
@@ -19,14 +20,14 @@ class GroupController extends Controller {
     }
 
     private create() {
-        this.router.post(`${GroupController.baseUrl}`, async (req, res) => {
+        this.router.post(`${GroupController.baseUrl}`, async (req, res, next) => {
             const groupDto = req.body as Group;
             try {
                 const group = await this.service.save(groupDto);
 
                 res.status(200).json(group);
             } catch (error) {
-                res.status(500).json({message: error});
+                next(new ControllerError('Group', 'createGroup', error));
             }
         });
     }
@@ -34,27 +35,39 @@ class GroupController extends Controller {
     private nestedRoutes() {
         this.router
             .route(`${GroupController.baseUrl}/:id`)
-            .get(async (req, res) => {
-                const userId = req.params.id;
+            .get(async (req, res, next) => {
+                try {
+                    const userId = req.params.id;
 
-                const user = await this.service.get(userId);
+                    const user = await this.service.get(userId);
 
-                res.status(200).json(user);
+                    res.status(200).json(user);
+                } catch (error) {
+                    next(new ControllerError('Group', 'getGroup', error));
+                }
             })
-            .delete(async (req, res) => {
-                const userId = req.params.id;
+            .delete(async (req, res, next) => {
+                try {
+                    const userId = req.params.id;
 
-                await this.service.delete(userId);
+                    await this.service.delete(userId);
 
-                res.status(200).json({message: `Group with id ${userId} was deleted`});
+                    res.status(200).json({message: `Group with id ${userId} was deleted`});
+                } catch (error) {
+                    next(new ControllerError('Group', 'deleteGroup', error));
+                }
             })
-            .post(async (req, res) => {
-                const userId = req.params.id;
-                const userPayload = req.body;
+            .post(async (req, res, next) => {
+                try {
+                    const userId = req.params.id;
+                    const userPayload = req.body;
 
-                await this.service.update({id: userId, ...userPayload});
+                    await this.service.update({id: userId, ...userPayload});
 
-                res.status(200).json({message: `Group was changed`});
+                    res.status(200).json({message: `Group was changed`});
+                } catch (error) {
+                    next(new ControllerError('Group', 'changeGroup', error));
+                }
             });
     }
 }

@@ -3,6 +3,7 @@ import {middleware} from '../middlewares';
 import {groupController} from '../controllers/groupController';
 import {userController} from '../controllers/userController';
 import {userGroupController} from '../controllers/userGroupController';
+import {handleControllerError, handleError} from './ErrorHandler';
 
 const controllers = [userController, groupController, userGroupController];
 
@@ -24,7 +25,14 @@ export class Server {
     }
 
     setRoutes() {
-        Server.controllers.forEach((controller) => this.application.use('/', controller.router));
+        Server.controllers.forEach((controller) => {
+            this.application.use('/', controller.router);
+            controller.router.use(handleControllerError);
+        });
+    }
+
+    setErrorHandler() {
+        this.application.use(handleError);
     }
 
     listen() {
