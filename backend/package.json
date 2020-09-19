@@ -6,7 +6,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "tsc": "tsc",
-        "setup:develop": "npm intall && nodemon",
+        "setup:develop": "npm install && nodemon",
         "develop": "nodemon",
         "build": "babel src --extensions \".ts\" --out-dir build --copy-files --no-copy-ignored",
         "lint": "eslint './src/**/*.ts' --fix"
