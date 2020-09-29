@@ -20,10 +20,10 @@ export const handleError: express.ErrorRequestHandler = (error, _request, respon
 };
 
 export class ControllerError {
-    constructor(public name: string, public method: string, public error: any) {}
+    constructor(public name: string, public method: string | null, public error: any) {}
 }
 
-export class ServerError extends Error {
+class ServerError extends Error {
     constructor(public status: number, public message: string, public ext?: object) {
         super();
     }

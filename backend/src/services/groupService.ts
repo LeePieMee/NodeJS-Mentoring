@@ -1,6 +1,6 @@
 import {IUser, Data, Group} from '../types';
 import {groupData} from '../dataAccess/groupData';
-import {ModelCtor, Op} from 'sequelize/types';
+import {ModelCtor} from 'sequelize/types';
 import {DataControl} from './dataService';
 
 export class GroupService extends DataControl<Group> {
