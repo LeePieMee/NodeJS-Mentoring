@@ -4,8 +4,9 @@ import {groupController} from '../controllers/groupController';
 import {userController} from '../controllers/userController';
 import {userGroupController} from '../controllers/userGroupController';
 import {handleControllerError, handleError} from './ErrorHandler';
+import {authController} from '../controllers/authController';
 
-const controllers = [userController, groupController, userGroupController];
+const controllers = [userController, groupController, userGroupController, authController];
 
 export class Server {
     private port: number;
@@ -18,6 +19,7 @@ export class Server {
         this.application = express();
         this.setMiddleware();
         this.setRoutes();
+        this.setErrorHandler();
     }
 
     setMiddleware() {
