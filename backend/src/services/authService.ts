@@ -14,8 +14,8 @@ export class AuthService {
         return await this.userModel.findOne({where: {login, password}});
     }
 
-    public generateAccessToken({login}: any) {
-        return jwt.sign({login}, 'secret', {expiresIn: '20s'});
+    public generateAccessToken(login: string) {
+        return jwt.sign({login}, 'secret', {expiresIn: '30m'});
     }
 }
 
