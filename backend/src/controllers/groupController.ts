@@ -3,7 +3,7 @@ import {groupService, GroupService} from '../services/groupService';
 import {Group} from '../types';
 import {ControllerError} from '../helpers/ErrorHandler';
 
-class GroupController extends Controller {
+export class GroupController extends Controller {
     static baseUrl = '/group';
     private service: GroupService;
 
