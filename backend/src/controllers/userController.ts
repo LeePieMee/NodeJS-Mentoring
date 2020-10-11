@@ -4,7 +4,7 @@ import {userService, UserService} from '../services/userService';
 import {Controller} from './controller';
 import {ControllerError} from '../helpers/ErrorHandler';
 
-class UserController extends Controller {
+export class UserController extends Controller {
     static baseUrl = '/user';
     private data: UserService;
 
